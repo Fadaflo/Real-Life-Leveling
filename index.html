@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Life Leveling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Real Life Leveling</h1>
+            <p id="currentDate"></p>
+            <button id="musicToggle" class="music-toggle">&#9835;</button> <!-- Music note symbol -->
+            <button id="challengeToggle" class="challenge-toggle">&#127942;</button> <!-- Trophy symbol -->
+        </header>
+
+        <div class="activity-input">
+            <input type="number" id="activityInput" placeholder="Enter count" min="1">
+        </div>
+
+        <div id="exerciseButtons" class="buttons">
+            <button id="addExerciseButton" class="add-exercise" onclick="showAddExerciseModal()">+ Add New Exercise</button>
+            <button class="delete-exercise" onclick="showDeleteExerciseModal()">Delete Exercises</button>
+        </div>
+
+        <div class="activity-counts">
+            <h2>Today's Activities</h2>
+            <div id="activityList"></div>
+            <button onclick="showResetTodaysActivitiesModal()">Reset Today's Activities</button>
+        </div>
+
+        <div class="statistics">
+            <div class="stats-box total-stats">
+                <h3>Total</h3>
+                <div id="totalStatsList" class="stats-details"></div>
+            </div>
+            <div class="stats-box">
+                <h3>Week</h3>
+                <div id="weekStatsDetails" class="stats-details"></div>
+            </div>
+            <div class="stats-box">
+                <h3>Month</h3>
+                <div id="monthStatsDetails" class="stats-details"></div>
+            </div>
+            <div class="stats-box">
+                <h3>Year</h3>
+                <div id="yearStatsDetails" class="stats-details"></div>
+            </div>
+        </div>
+
+        <div class="history">
+            <button onclick="showHistory()">View History</button>
+        </div>
+
+        <!-- Audio element for background music -->
+        <audio id="backgroundMusic" loop autoplay>
+            <source src="songs/andrew-tate-theme-song.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content welcome-content">
+            <span class="close" onclick="closeModal('welcomeModal')">&times;</span>
+            <h2>Welcome To<br>Real Life Leveling!</h2>
+            <p>Life is a game.</p>
+            <p>Track your daily progress, and level up every day.</p>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('historyModal')">&times;</span>
+            <h2>Exercise History</h2>
+            <div class="calendar-navigation">
+                <button onclick="changeMonth(-1)">&#9664; Previous Month</button>
+                <div id="currentMonthYear"></div>
+                <button onclick="changeMonth(1)">Next Month &#9654;</button>
+            </div>
+            <div id="calendar" class="calendar"></div>
+            <input type="date" id="searchDate">
+            <button onclick="searchByDate()">Search</button>
+            <div id="monthlyStats" class="daily-details"></div>
+        </div>
+    </div>
+
+    <div id="dailyDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dailyDetailsModal')">&times;</span>
+            <h2 id="selectedDate">Details for </h2>
+            <div id="detailsContent" class="daily-details"></div>
+        </div>
+    </div>
+
+    <div id="exerciseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('exerciseModal')">&times;</span>
+            <h2>Add New Exercise</h2>
+            <input type="text" id="newExerciseName" placeholder="Exercise Name">
+            <button onclick="addNewExercise()">Add Exercise</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('deleteModal')">&times;</span>
+            <h2>Delete Exercises</h2>
+            <div id="exerciseDeleteList"></div>
+            <button onclick="deleteSelectedExercises()">Delete Selected</button>
+        </div>
+    </div>
+
+    <div id="resetTodayModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('resetTodayModal')">&times;</span>
+            <h2>Reset Today's Activities</h2>
+            <p>Are you sure you want to reset today's activities? This will adjust your weekly, monthly, and yearly stats accordingly.</p>
+            <button onclick="resetTodaysActivities()">Confirm Reset</button>
+        </div>
+    </div>
+
+    <div id="challengeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('challengeModal')">&times;</span>
+            <h2>Challenges</h2>
+            <div id="challengeList"></div>
+            <button onclick="showAddChallengeModal()">Start New Challenge</button>
+            <button onclick="showDeleteChallengeModal()">Delete Challenges</button>
+        </div>
+    </div>
+
+    <div id="addChallengeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addChallengeModal')">&times;</span>
+            <h2>Add New Challenge</h2>
+            <div id="exerciseSelection">
+                <!-- Exercise selection buttons will be dynamically populated -->
+            </div>
+            <div id="challengeSettings" style="display: none;">
+                <h3>Set Challenge Levels</h3>
+                <label>Bronze: <input type="number" id="bronzeLevel" value="1000" min="1"></label>
+                <label>Silver: <input type="number" id="silverLevel" value="2500" min="1"></label>
+                <label>Gold: <input type="number" id="goldLevel" value="5000" min="1"></label>
+                <label>Champion: <input type="number" id="championLevel" value="10000" min="1"></label>
+                <button onclick="createChallenge()">Start Challenge</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="congratulationsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('congratulationsModal')">&times;</span>
+            <h2>Congratulations!</h2>
+            <p id="congratulationsMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

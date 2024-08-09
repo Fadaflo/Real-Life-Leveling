@@ -1,0 +1,464 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #2a0845, #6441a5);
+    color: #eee;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 100px; /* Add extra padding to prevent banner coverage */
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #ff4081;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    flex: 1;
+    text-align: center;
+}
+
+.music-toggle,
+.challenge-toggle {
+    font-size: 24px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.music-toggle {
+    margin-right: auto;
+}
+
+.challenge-toggle {
+    margin-left: auto;
+}
+
+.activity-input {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.activity-input input {
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 200px;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #eee;
+    text-align: center;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.buttons button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #6200ea;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 1 1 calc(25% - 10px); /* Ensure four buttons fit in a row */
+    box-sizing: border-box;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.buttons button:hover {
+    background-color: #3700b3;
+    transform: translateY(-3px);
+}
+
+.add-exercise {
+    background-color: #ff4081;
+    flex: 1 1 calc(25% - 10px);
+}
+
+.add-exercise:hover {
+    background-color: #f50057;
+}
+
+.delete-exercise {
+    flex: 1 1 100%;
+    background-color: #ff4081;
+    margin-top: 10px;
+}
+
+.delete-exercise:hover {
+    background-color: #f50057;
+}
+
+.activity-counts {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.activity-counts h2 {
+    margin-top: 0;
+    font-size: 22px;
+    border-bottom: 2px solid #ff4081;
+    padding-bottom: 5px;
+    color: #ff4081;
+}
+
+.activity-counts button {
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: #ff4081;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.activity-counts button:hover {
+    background-color: #3700b3;
+    transform: translateY(-3px);
+}
+
+.statistics {
+    margin-bottom: 20px;
+}
+
+.stats-box {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+    border: 2px solid #6441a5; /* Border for stats box */
+}
+
+.stats-box h3 {
+    margin: 0;
+    color: #ff4081;
+    font-size: 20px;
+    border-bottom: 1px solid #ff4081;
+    padding-bottom: 5px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.total-stats {
+    border: 3px solid #ff4081; /* Thicker border for total stats */
+    background: linear-gradient(135deg, #480048, #c04848); /* Gradient background for total stats */
+    color: #f0f0f0;
+}
+
+.stats-details {
+    margin-top: 10px;
+    color: #fff; /* Use white with gradient effect */
+    font-family: 'Arial', sans-serif;
+}
+
+.stats-details p {
+    margin: 5px 0;
+    font-weight: bold;
+    font-size: 18px;
+    color: transparent;
+    background: linear-gradient(90deg, #ff4081, #6200ea);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.history {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.history button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #ff4081;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.history button:hover {
+    background-color: #3700b3;
+    transform: translateY(-3px);
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 5% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #ff4081;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    color: #eee;
+    overflow-y: auto; /* Allow scrolling if content is too large */
+    max-height: 80vh; /* Limit the height of the modal */
+}
+
+.close {
+    color: #ff4081;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #ff4081;
+}
+
+.modal-content input[type="date"],
+.modal-content input[type="text"],
+.modal-content input[type="number"] {
+    padding: 10px;
+    font-size: 16px;
+    width: calc(100% - 22px);
+    margin-bottom: 15px;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #eee;
+    text-align: center;
+}
+
+.modal-content button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #6200ea;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.modal-content button:hover {
+    background-color: #3700b3;
+    transform: translateY(-3px);
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.calendar-navigation button {
+    background-color: #ff4081;
+    border: none;
+    padding: 10px;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.calendar-navigation button:hover {
+    background-color: #3700b3;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    padding-bottom: 10px;
+}
+
+.calendar div {
+    background-color: #6200ea;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.calendar div:hover {
+    background-color: #3700b3;
+}
+
+.empty-day {
+    visibility: hidden; /* Hide empty days */
+}
+
+.daily-details {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* New CSS for the delete exercise button feedback */
+.exercise-delete-button {
+    background-color: #6200ea;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 5px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.exercise-delete-button.selected {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* Music toggle button */
+.music-toggle {
+    position: absolute;
+    top: 10px;
+    left: 20px; /* Adjusted position */
+    font-size: 24px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.music-toggle.muted {
+    color: #ccc; /* Gray when muted */
+    text-decoration: line-through; /* Visual indication of mute */
+}
+
+.music-toggle:hover {
+    color: #f50057;
+}
+
+/* Challenge toggle button */
+.challenge-toggle {
+    position: absolute;
+    top: 10px;
+    right: 20px; /* Adjusted position */
+    font-size: 24px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.challenge-toggle:hover {
+    color: #f50057;
+}
+
+/* Welcome modal styling */
+.welcome-content {
+    text-align: center;
+    background: linear-gradient(135deg, #6441a5, #2a0845);
+    border: 2px solid #ff4081;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-content h2 {
+    color: #ff4081;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-content p {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#exerciseSelection button.selected {
+    background-color: #ff4081; /* Highlight selected exercise */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .buttons button {
+        flex: 1 1 calc(50% - 10px); /* Two buttons per row on small screens */
+    }
+
+    .delete-exercise {
+        flex: 1 1 calc(100% - 10px);
+    }
+}
+
+/* Add this CSS for the progress circle */
+.progress-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    margin-right: 15px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.challenge-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
