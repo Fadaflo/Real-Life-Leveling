@@ -799,3 +799,42 @@ function deactivateSelectedExercises() {
     updateAllStatistics();
     closeModal('activationModal');
 }
+
+
+
+
+
+
+// Füge dies am Ende deines bestehenden JavaScript-Codes hinzu
+function handleAppVisibility() {
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            // Speichere den aktuellen Zeitpunkt und stoppe die Musik
+            localStorage.setItem('musicCurrentTime', backgroundMusic.currentTime);
+            backgroundMusic.pause();
+        } else {
+            // Setze die Musik an der gespeicherten Stelle fort
+            const savedTime = parseFloat(localStorage.getItem('musicCurrentTime') || '0');
+            backgroundMusic.currentTime = savedTime;
+
+            // Spiele die Musik nur, wenn sie nicht stummgeschaltet ist
+            const isMuted = JSON.parse(localStorage.getItem('musicMuted') || 'false');
+            if (!isMuted) {
+                backgroundMusic.play();
+            }
+        }
+    });
+}
+
+// Füge diese Funktion innerhalb des DOMContentLoaded-Ereignisses hinzu
+document.addEventListener('DOMContentLoaded', () => {
+    loadActivityData();
+    initMusicControls();
+    initChallengeControls();
+    initActivationControls();
+    showWelcomeScreen();
+    handleAppVisibility(); // Diese Zeile sorgt dafür, dass die Musik kontrolliert wird
+});
+
