@@ -13,6 +13,7 @@
             <p id="currentDate"></p>
             <button id="musicToggle" class="music-toggle">&#9835;</button> <!-- Music note symbol -->
             <button id="challengeToggle" class="challenge-toggle">&#127942;</button> <!-- Trophy symbol -->
+            <button id="activationToggle" class="activation-toggle">&#9200;</button> <!-- Stop symbol -->
         </header>
 
         <div class="activity-input">
@@ -155,6 +156,16 @@
             <span class="close" onclick="closeModal('congratulationsModal')">&times;</span>
             <h2>Congratulations!</h2>
             <p id="congratulationsMessage"></p>
+        </div>
+    </div>
+
+    <div id="activationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('activationModal')">&times;</span>
+            <h2>Activate/Deactivate Exercises</h2>
+            <div id="exerciseActivationList"></div>
+            <button onclick="activateSelectedExercises()">Activate Selected</button>
+            <button onclick="deactivateSelectedExercises()">Deactivate Selected</button>
         </div>
     </div>
 
