@@ -143,6 +143,7 @@ function updateChallengeProgress(activity, count) {
     }
 }
 
+
 // Advance to the next challenge rank
 function advanceChallengeRank(activity) {
     let challenge = challenges[activity];
@@ -545,8 +546,15 @@ function updateChallengeList() {
 
     for (const [exercise, challenge] of Object.entries(challenges)) {
         const progressText = challenge.rank === 'Legend' 
-    ? `${challenge.legendLevel}` 
-    : `${challenge.progress}${challenge.levels[challenge.rank.toLowerCase()] ? '/' + challenge.levels[challenge.rank.toLowerCase()] : ''}`;
+            ? `${challenge.legendLevel}` 
+            : `${challenge.progress}${challenge.levels[challenge.rank.toLowerCase()] ? '/' + challenge.levels[challenge.rank.toLowerCase()] : ''}`;
+
+        const startDate = new Date(challenge.startDate);
+        const today = new Date();
+        const timeDiff = today - startDate;
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Calculate days difference
+
+        const startDateText = `${startDate.toLocaleDateString()} (${daysDiff}d ago)`;
 
         const challengeElement = document.createElement('div');
         challengeElement.classList.add('challenge-item');
@@ -557,11 +565,14 @@ function updateChallengeList() {
             <div>
                 <div class="challenge-name">${exercise} Challenge</div>
                 <div class="challenge-rank">Rank: ${challenge.rank}</div>
+                <div class="challenge-start-date">Started: ${startDateText}</div>
             </div>
         `;
         challengeList.appendChild(challengeElement);
     }
 }
+
+
 
 // Show add challenge modal
 function showAddChallengeModal() {
@@ -597,11 +608,12 @@ function createChallenge() {
         return;
     }
 
-    const exercise = selectedButton.textContent.toLowerCase();
+    const exercise = selectedButton.textContent.trim(); // Exact exercise name as selected
     const bronzeLevel = parseInt(document.getElementById('bronzeLevel').value);
     const silverLevel = parseInt(document.getElementById('silverLevel').value);
     const goldLevel = parseInt(document.getElementById('goldLevel').value);
     const championLevel = parseInt(document.getElementById('championLevel').value);
+    const startDate = new Date(); // Capture the current date as start date
 
     challenges[exercise] = {
         rank: 'Bronze',
@@ -612,13 +624,16 @@ function createChallenge() {
             gold: goldLevel,
             champion: championLevel
         },
-        legendLevel: 0 // Initialize legend level count
+        legendLevel: 0, // Initialize legend level count
+        startDate: startDate.toISOString() // Store start date as ISO string
     };
 
     saveActivityData();
     updateChallengeList();
     closeModal('addChallengeModal');
 }
+
+
 
 // Show delete challenge modal
 function showDeleteChallengeModal() {
@@ -658,4 +673,3 @@ function showWelcomeScreen() {
     const welcomeModal = document.getElementById('welcomeModal');
     welcomeModal.style.display = 'block';
 }
-
