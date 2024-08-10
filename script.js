@@ -6,11 +6,15 @@ let challenges = JSON.parse(localStorage.getItem('challenges')) || {};
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 let today = new Date().toLocaleDateString();
+let currentDay = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
 
 // Load data from localStorage
 function loadActivityData() {
     const storedActivityCounts = JSON.parse(localStorage.getItem('activityCounts'));
     const storedLastDate = localStorage.getItem('lastDate');
+    const lastDayOfWeek = localStorage.getItem('lastDayOfWeek');
+    const lastDayOfMonth = localStorage.getItem('lastDayOfMonth');
+    const lastYear = localStorage.getItem('lastYear');
 
     if (storedActivityCounts) {
         for (const [exercise, data] of Object.entries(storedActivityCounts)) {
@@ -19,37 +23,34 @@ function loadActivityData() {
         }
     }
 
-    // Reset counts if a new day, week, month, or year has started
-    if (storedLastDate) {
-        const lastDate = new Date(storedLastDate);
-        const currentDate = new Date();
+    // Reset daily counts if a new day has started
+    if (storedLastDate && storedLastDate !== today) {
+        resetTodaysCounts(); // Reset today's counts at midnight
+    }
 
-        // Reset today's counts if a new day has started
-        if (lastDate.toLocaleDateString() !== currentDate.toLocaleDateString()) {
-            resetTodaysCounts();
-        }
+    // Reset weekly counts if it's a new week (Monday)
+    if (lastDayOfWeek !== undefined && currentDay === 1 && parseInt(lastDayOfWeek) !== 1) {
+        resetWeekCounts();
+    }
 
-        // Reset weekly counts if a new week has started (Monday)
-        if (currentDate.getDay() === 1 && lastDate.getDay() !== 1) {
-            resetWeeklyCounts();
-        }
+    // Reset monthly counts if it's a new month (1st of the month)
+    if (lastDayOfMonth !== undefined && new Date().getDate() === 1 && parseInt(lastDayOfMonth) !== 1) {
+        resetMonthCounts();
+    }
 
-        // Reset monthly counts if a new month has started
-        if (currentDate.getMonth() !== lastDate.getMonth()) {
-            resetMonthlyCounts();
-        }
-
-        // Reset yearly counts if a new year has started
-        if (currentDate.getFullYear() !== lastDate.getFullYear()) {
-            resetYearlyCounts();
-        }
+    // Reset yearly counts if it's a new year (1st January)
+    if (lastYear !== undefined && currentYear !== parseInt(lastYear)) {
+        resetYearCounts();
     }
 
     updateAllStatistics();
     updateActivityList();
 
-    // Update the last date in localStorage
+    // Update the last date, day of the week, day of the month, and year in localStorage
     localStorage.setItem('lastDate', today);
+    localStorage.setItem('lastDayOfWeek', currentDay);
+    localStorage.setItem('lastDayOfMonth', new Date().getDate());
+    localStorage.setItem('lastYear', currentYear);
 }
 
 // Save activity data to localStorage
@@ -58,6 +59,33 @@ function saveActivityData() {
     localStorage.setItem('dailyActivityLog', JSON.stringify(dailyActivityLog));
     localStorage.setItem('challenges', JSON.stringify(challenges));
     localStorage.setItem('lastDate', today);
+    localStorage.setItem('lastDayOfWeek', currentDay);
+    localStorage.setItem('lastDayOfMonth', new Date().getDate());
+    localStorage.setItem('lastYear', currentYear);
+}
+
+// Reset weekly counts
+function resetWeekCounts() {
+    for (const exercise in activityCounts) {
+        activityCounts[exercise].week = 0;
+    }
+    console.log("Week stats reset");
+}
+
+// Reset monthly counts
+function resetMonthCounts() {
+    for (const exercise in activityCounts) {
+        activityCounts[exercise].month = 0;
+    }
+    console.log("Month stats reset");
+}
+
+// Reset yearly counts
+function resetYearCounts() {
+    for (const exercise in activityCounts) {
+        activityCounts[exercise].year = 0;
+    }
+    console.log("Year stats reset");
 }
 
 // Add activity to the count
@@ -140,7 +168,7 @@ function showCongratulationsModal(activity, rank) {
 
 // Update activity counts on the UI
 function updateActivityCounts(activity) {
-    document.getElementById(`${activity}Count`).textContent = `${capitalizeFirstLetter(activity)}: ${activityCounts[activity].count}`;
+    document.getElementById(`${activity}Count`).textContent = `${activity}: ${activityCounts[activity].count}`;
 }
 
 // Update all statistics
@@ -155,7 +183,7 @@ function updateAllStatistics() {
 function updateStatistics(period) {
     const periodStatsElement = document.getElementById(`${period}StatsDetails`);
     const stats = Object.keys(activityCounts).map(activity => {
-        return `+${activityCounts[activity][period]} ${capitalizeFirstLetter(activity)}`;
+        return `+${activityCounts[activity][period]} ${activity}`;
     });
     periodStatsElement.innerHTML = stats.map(stat => `<p>${stat}</p>`).join('');
 }
@@ -164,7 +192,7 @@ function updateStatistics(period) {
 function updateTotalStatistics() {
     const totalStatsElement = document.getElementById('totalStatsList');
     const stats = Object.keys(activityCounts).map(activity => {
-        return `${capitalizeFirstLetter(activity)}: ${activityCounts[activity].total}`;
+        return `${activity}: ${activityCounts[activity].total}`;
     });
     totalStatsElement.innerHTML = stats.map(stat => `<p>${stat}</p>`).join('');
 }
@@ -228,7 +256,7 @@ function showDailyDetails(date) {
 
     if (dailyActivityLog[date]) {
         const details = Object.keys(dailyActivityLog[date]).map(activity => {
-            return `<p>${capitalizeFirstLetter(activity)}: ${dailyActivityLog[date][activity]}</p>`;
+            return `<p>${activity}: ${dailyActivityLog[date][activity]}</p>`;
         }).join('');
         detailsContentElement.innerHTML = details;
     } else {
@@ -282,7 +310,7 @@ function updateMonthlyStatistics() {
     }
 
     const stats = Object.keys(monthlyTotals).map(activity => {
-        return `${capitalizeFirstLetter(activity)}: ${monthlyTotals[activity]}`;
+        return `${activity}: ${monthlyTotals[activity]}`;
     }).join('<br>');
 
     monthlyStatsElement.innerHTML = `<h3>${currentMonthName} Total:</h3>${stats}`;
@@ -324,30 +352,6 @@ function resetTodaysActivities() {
     closeModal('resetTodayModal');
 }
 
-// Reset weekly counts to zero
-function resetWeeklyCounts() {
-    Object.keys(activityCounts).forEach(activity => {
-        activityCounts[activity].week = 0;
-    });
-    saveActivityData();
-}
-
-// Reset monthly counts to zero
-function resetMonthlyCounts() {
-    Object.keys(activityCounts).forEach(activity => {
-        activityCounts[activity].month = 0;
-    });
-    saveActivityData();
-}
-
-// Reset yearly counts to zero
-function resetYearlyCounts() {
-    Object.keys(activityCounts).forEach(activity => {
-        activityCounts[activity].year = 0;
-    });
-    saveActivityData();
-}
-
 // Show reset today's activities modal
 function showResetTodaysActivitiesModal() {
     const resetTodayModal = document.getElementById('resetTodayModal');
@@ -357,7 +361,7 @@ function showResetTodaysActivitiesModal() {
 // Add a new exercise button dynamically
 function addNewExercise() {
     const exerciseNameInput = document.getElementById('newExerciseName');
-    const exerciseName = exerciseNameInput.value.trim().toLowerCase();
+    const exerciseName = exerciseNameInput.value.trim();
 
     if (exerciseName && !activityCounts[exerciseName]) {
         // Initialize new exercise counts
@@ -378,7 +382,7 @@ function addNewExercise() {
 function createNewExerciseUI(exerciseName) {
     // Create a button for the new exercise
     const newButton = document.createElement('button');
-    newButton.textContent = `Add ${capitalizeFirstLetter(exerciseName)}`;
+    newButton.textContent = `Add ${exerciseName}`;
     newButton.onclick = () => addActivity(exerciseName);
     newButton.classList.add('exercise-button');
     document.getElementById('exerciseButtons').insertBefore(newButton, document.getElementById('addExerciseButton'));
@@ -387,7 +391,7 @@ function createNewExerciseUI(exerciseName) {
     const activityList = document.getElementById('activityList');
     const newActivityElement = document.createElement('p');
     newActivityElement.id = `${exerciseName}Count`;
-    newActivityElement.textContent = `${capitalizeFirstLetter(exerciseName)}: 0`;
+    newActivityElement.textContent = `${exerciseName}: 0`;
     activityList.appendChild(newActivityElement);
 }
 
@@ -406,7 +410,7 @@ function showDeleteExerciseModal() {
     // Populate the list with current exercises
     for (const exercise in activityCounts) {
         const exerciseButton = document.createElement('button');
-        exerciseButton.textContent = capitalizeFirstLetter(exercise);
+        exerciseButton.textContent = exercise;
         exerciseButton.classList.add('exercise-delete-button');
         exerciseButton.onclick = () => {
             exerciseButton.classList.toggle('selected');
@@ -422,13 +426,13 @@ function showDeleteExerciseModal() {
 function deleteSelectedExercises() {
     const selectedButtons = document.querySelectorAll('.exercise-delete-button.selected');
     selectedButtons.forEach(button => {
-        const exerciseName = button.textContent.toLowerCase();
+        const exerciseName = button.textContent;
         delete activityCounts[exerciseName];
 
         // Remove the button from the UI
         const buttonElements = document.querySelectorAll('#exerciseButtons button');
         buttonElements.forEach(btn => {
-            if (btn.textContent.includes(capitalizeFirstLetter(exerciseName))) {
+            if (btn.textContent.includes(exerciseName)) {
                 btn.remove();
             }
         });
@@ -470,7 +474,7 @@ function resetTodaysCounts() {
 function updateActivityList() {
     for (const exercise in activityCounts) {
         if (document.getElementById(`${exercise}Count`)) {
-            document.getElementById(`${exercise}Count`).textContent = `${capitalizeFirstLetter(exercise)}: ${activityCounts[exercise].count}`;
+            document.getElementById(`${exercise}Count`).textContent = `${exercise}: ${activityCounts[exercise].count}`;
         }
     }
 }
@@ -551,7 +555,7 @@ function updateChallengeList() {
                 <span>${progressText}</span>
             </div>
             <div>
-                <div class="challenge-name">${capitalizeFirstLetter(exercise)} Challenge</div>
+                <div class="challenge-name">${exercise} Challenge</div>
                 <div class="challenge-rank">Rank: ${challenge.rank}</div>
             </div>
         `;
@@ -568,7 +572,7 @@ function showAddChallengeModal() {
     // Populate with exercises
     for (const exercise in activityCounts) {
         const exerciseButton = document.createElement('button');
-        exerciseButton.textContent = capitalizeFirstLetter(exercise);
+        exerciseButton.textContent = exercise;
         exerciseButton.onclick = () => {
             // Toggle selection
             const buttons = exerciseSelection.querySelectorAll('button');
@@ -623,7 +627,7 @@ function showDeleteChallengeModal() {
 
     for (const exercise in challenges) {
         const challengeButton = document.createElement('button');
-        challengeButton.textContent = capitalizeFirstLetter(exercise);
+        challengeButton.textContent = exercise;
         challengeButton.classList.add('challenge-delete-button');
         challengeButton.onclick = () => {
             challengeButton.classList.toggle('selected');
