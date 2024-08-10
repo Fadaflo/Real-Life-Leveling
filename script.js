@@ -1,3 +1,4 @@
+// Initialisieren der Variablen und Laden von Daten aus dem localStorage
 const activityCounts = {};
 let deactivatedExercises = JSON.parse(localStorage.getItem('deactivatedExercises')) || [];
 const dailyActivityLog = JSON.parse(localStorage.getItem('dailyActivityLog')) || {};
@@ -6,9 +7,8 @@ let challenges = JSON.parse(localStorage.getItem('challenges')) || {};
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 let today = new Date().toLocaleDateString();
-let currentDay = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
+let currentDay = new Date().getDay(); // 0 für Sonntag, 1 für Montag, etc.
 
-// Load data from localStorage
 function loadActivityData() {
     const storedActivityCounts = JSON.parse(localStorage.getItem('activityCounts'));
     const storedLastDate = localStorage.getItem('lastDate');
@@ -25,22 +25,18 @@ function loadActivityData() {
         }
     }
 
-    // Reset daily counts if a new day has started
     if (storedLastDate && storedLastDate !== today) {
-        resetTodaysCounts(); // Reset today's counts at midnight
+        resetTodaysCounts();
     }
 
-    // Reset weekly counts if it's a new week (Monday)
     if (lastDayOfWeek !== undefined && currentDay === 1 && parseInt(lastDayOfWeek) !== 1) {
         resetWeekCounts();
     }
 
-    // Reset monthly counts if it's a new month (1st of the month)
     if (lastDayOfMonth !== undefined && new Date().getDate() === 1 && parseInt(lastDayOfMonth) !== 1) {
         resetMonthCounts();
     }
 
-    // Reset yearly counts if it's a new year (1st January)
     if (lastYear !== undefined && currentYear !== parseInt(lastYear)) {
         resetYearCounts();
     }
@@ -48,14 +44,12 @@ function loadActivityData() {
     updateAllStatistics();
     updateActivityList();
 
-    // Update the last date, day of the week, day of the month, and year in localStorage
     localStorage.setItem('lastDate', today);
     localStorage.setItem('lastDayOfWeek', currentDay);
     localStorage.setItem('lastDayOfMonth', new Date().getDate());
     localStorage.setItem('lastYear', currentYear);
 }
 
-// Save activity data to localStorage
 function saveActivityData() {
     localStorage.setItem('activityCounts', JSON.stringify(activityCounts));
     localStorage.setItem('dailyActivityLog', JSON.stringify(dailyActivityLog));
@@ -67,7 +61,6 @@ function saveActivityData() {
     localStorage.setItem('lastYear', currentYear);
 }
 
-// Reset weekly counts
 function resetWeekCounts() {
     for (const exercise in activityCounts) {
         activityCounts[exercise].week = 0;
@@ -75,7 +68,6 @@ function resetWeekCounts() {
     console.log("Week stats reset");
 }
 
-// Reset monthly counts
 function resetMonthCounts() {
     for (const exercise in activityCounts) {
         activityCounts[exercise].month = 0;
@@ -83,7 +75,6 @@ function resetMonthCounts() {
     console.log("Month stats reset");
 }
 
-// Reset yearly counts
 function resetYearCounts() {
     for (const exercise in activityCounts) {
         activityCounts[exercise].year = 0;
@@ -91,21 +82,23 @@ function resetYearCounts() {
     console.log("Year stats reset");
 }
 
-// Add activity to the count
 function addActivity(activity) {
     const inputElement = document.getElementById("activityInput");
+
+    if (switchModeActive) {
+        return;
+    }
+
     const count = parseInt(inputElement.value);
     if (!isNaN(count) && count > 0) {
         const today = new Date().toLocaleDateString();
 
-        // Update counts
         activityCounts[activity].count += count;
         activityCounts[activity].week += count;
         activityCounts[activity].month += count;
         activityCounts[activity].year += count;
         activityCounts[activity].total += count;
 
-        // Update daily log
         if (!dailyActivityLog[today]) {
             dailyActivityLog[today] = {};
         }
@@ -117,26 +110,22 @@ function addActivity(activity) {
         updateActivityCounts(activity);
         updateAllStatistics();
         saveActivityData();
-        inputElement.value = '';  // Clear the input field
+        inputElement.value = '';
 
-        // Update challenge progress
         updateChallengeProgress(activity, count);
     } else {
         alert("Please enter a valid number.");
     }
 }
 
-// Update challenge progress
 function updateChallengeProgress(activity, count) {
     if (challenges[activity]) {
         let challenge = challenges[activity];
         challenge.progress += count;
 
         if (challenge.rank === 'Legend') {
-            // Continue counting in legend mode
             challenge.legendLevel += count;
         } else {
-            // Check if the current rank is completed
             if (challenge.progress >= challenge.levels[challenge.rank.toLowerCase()]) {
                 showCongratulationsModal(activity, challenge.rank);
                 advanceChallengeRank(activity);
@@ -146,7 +135,6 @@ function updateChallengeProgress(activity, count) {
     }
 }
 
-// Advance to the next challenge rank
 function advanceChallengeRank(activity) {
     let challenge = challenges[activity];
     const ranks = ['bronze', 'silver', 'gold', 'champion', 'legend'];
@@ -156,12 +144,11 @@ function advanceChallengeRank(activity) {
         challenge.rank = ranks[currentRankIndex + 1];
 
         if (challenge.rank === 'Legend') {
-            challenge.legendLevel = challenge.progress; // Start legend level counting
+            challenge.legendLevel = challenge.progress;
         }
     }
 }
 
-// Show the congratulations modal
 function showCongratulationsModal(activity, rank) {
     const modal = document.getElementById('congratulationsModal');
     const message = document.getElementById('congratulationsMessage');
@@ -169,12 +156,10 @@ function showCongratulationsModal(activity, rank) {
     modal.style.display = 'block';
 }
 
-// Update activity counts on the UI
 function updateActivityCounts(activity) {
     document.getElementById(`${activity}Count`).textContent = `${activity}: ${activityCounts[activity].count}`;
 }
 
-// Update all statistics
 function updateAllStatistics() {
     updateStatistics('week');
     updateStatistics('month');
@@ -182,7 +167,6 @@ function updateAllStatistics() {
     updateTotalStatistics();
 }
 
-// Update statistics for a given period
 function updateStatistics(period) {
     const periodStatsElement = document.getElementById(`${period}StatsDetails`);
     const stats = Object.keys(activityCounts).filter(activity => !deactivatedExercises.includes(activity)).map(activity => {
@@ -191,7 +175,6 @@ function updateStatistics(period) {
     periodStatsElement.innerHTML = stats.map(stat => `<p>${stat}</p>`).join('');
 }
 
-// Update total statistics
 function updateTotalStatistics() {
     const totalStatsElement = document.getElementById('totalStatsList');
     const stats = Object.keys(activityCounts).filter(activity => !deactivatedExercises.includes(activity)).map(activity => {
@@ -200,12 +183,10 @@ function updateTotalStatistics() {
     totalStatsElement.innerHTML = stats.map(stat => `<p>${stat}</p>`).join('');
 }
 
-// Capitalize the first letter of a word
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-// Show history modal
 function showHistory() {
     const historyModal = document.getElementById('historyModal');
     updateCalendar();
@@ -213,23 +194,19 @@ function showHistory() {
     historyModal.style.display = 'block';
 }
 
-// Close modal
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
-// Update the calendar with clickable dates
 function updateCalendar() {
     const calendarElement = document.getElementById('calendar');
-    calendarElement.innerHTML = '';  // Clear previous calendar
+    calendarElement.innerHTML = '';
 
     const monthYearElement = document.getElementById('currentMonthYear');
     monthYearElement.textContent = `${new Date(currentYear, currentMonth).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}`;
 
-    // Get number of days in the current month
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // Fill with empty days if month doesn't start on Sunday
     const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
         const emptyDayElement = document.createElement('div');
@@ -243,19 +220,18 @@ function updateCalendar() {
 
         const dayElement = document.createElement('div');
         dayElement.textContent = day;
-        dayElement.onclick = () => showDailyDetails(dateString);  // Set up click handler
+        dayElement.onclick = () => showDailyDetails(dateString);
         calendarElement.appendChild(dayElement);
     }
 }
 
-// Show details for a specific date
 function showDailyDetails(date) {
     const detailsModal = document.getElementById('dailyDetailsModal');
     const selectedDateElement = document.getElementById('selectedDate');
     const detailsContentElement = document.getElementById('detailsContent');
 
     selectedDateElement.textContent = date;
-    detailsContentElement.innerHTML = '';  // Clear previous details
+    detailsContentElement.innerHTML = '';
 
     if (dailyActivityLog[date]) {
         const details = Object.keys(dailyActivityLog[date]).map(activity => {
@@ -269,7 +245,6 @@ function showDailyDetails(date) {
     detailsModal.style.display = 'block';
 }
 
-// Change month and update the calendar
 function changeMonth(direction) {
     currentMonth += direction;
     if (currentMonth < 0) {
@@ -283,7 +258,6 @@ function changeMonth(direction) {
     updateMonthlyStatistics();
 }
 
-// Search history by date
 function searchByDate() {
     const searchDateInput = document.getElementById("searchDate");
     const searchDate = new Date(searchDateInput.value).toLocaleDateString();
@@ -294,7 +268,6 @@ function searchByDate() {
     }
 }
 
-// Update monthly statistics
 function updateMonthlyStatistics() {
     const monthlyStatsElement = document.getElementById("monthlyStats");
     const currentMonthName = new Date(currentYear, currentMonth).toLocaleDateString(undefined, { month: 'long' });
@@ -319,20 +292,18 @@ function updateMonthlyStatistics() {
     monthlyStatsElement.innerHTML = `<h3>${currentMonthName} Total:</h3>${stats}`;
 }
 
-// Reset today's activities
 function resetTodaysActivities() {
     const today = new Date().toLocaleDateString();
 
     if (dailyActivityLog[today]) {
         Object.keys(dailyActivityLog[today]).forEach(activity => {
             const count = dailyActivityLog[today][activity];
-            activityCounts[activity].total -= count; // Deduct from total
-            activityCounts[activity].count = 0; // Reset today's count
+            activityCounts[activity].total -= count;
+            activityCounts[activity].count = 0;
             activityCounts[activity].week -= count;
             activityCounts[activity].month -= count;
             activityCounts[activity].year -= count;
 
-            // Update challenge progress
             if (challenges[activity]) {
                 challenges[activity].progress -= count;
                 if (challenges[activity].rank === 'Legend') {
@@ -340,7 +311,6 @@ function resetTodaysActivities() {
                 }
             }
 
-            // Remove today's record
             delete dailyActivityLog[today][activity];
         });
 
@@ -355,25 +325,21 @@ function resetTodaysActivities() {
     closeModal('resetTodayModal');
 }
 
-// Show reset today's activities modal
 function showResetTodaysActivitiesModal() {
     const resetTodayModal = document.getElementById('resetTodayModal');
     resetTodayModal.style.display = 'block';
 }
 
-// Add a new exercise button dynamically
 function addNewExercise() {
     const exerciseNameInput = document.getElementById('newExerciseName');
     const exerciseName = exerciseNameInput.value.trim();
 
     if (exerciseName && !activityCounts[exerciseName]) {
-        // Initialize new exercise counts
         activityCounts[exerciseName] = { count: 0, week: 0, month: 0, year: 0, total: 0 };
 
-        // Create button and today's activity UI
         createNewExerciseUI(exerciseName);
 
-        exerciseNameInput.value = ''; // Clear the input
+        exerciseNameInput.value = '';
         saveActivityData();
     } else {
         alert('Exercise already exists or invalid name!');
@@ -381,16 +347,19 @@ function addNewExercise() {
     closeModal('exerciseModal');
 }
 
-// Create UI elements for a new exercise
 function createNewExerciseUI(exerciseName) {
-    // Create a button for the new exercise
     const newButton = document.createElement('button');
     newButton.textContent = `Add ${exerciseName}`;
-    newButton.onclick = () => addActivity(exerciseName);
     newButton.classList.add('exercise-button');
+    newButton.onclick = function() {
+        if (switchModeActive) {
+            selectExerciseForSwitch(newButton);
+        } else {
+            addActivity(exerciseName);
+        }
+    };
     document.getElementById('exerciseButtons').insertBefore(newButton, document.getElementById('addExerciseButton'));
 
-    // Add to "Today's Activities"
     const activityList = document.getElementById('activityList');
     const newActivityElement = document.createElement('p');
     newActivityElement.id = `${exerciseName}Count`;
@@ -398,26 +367,132 @@ function createNewExerciseUI(exerciseName) {
     activityList.appendChild(newActivityElement);
 }
 
-// Show add exercise modal
+let switchModeActive = false;
+let firstSelectedExercise = null;
+
+document.getElementById('switchModeButton').addEventListener('click', function() {
+    switchModeActive = !switchModeActive;
+    this.classList.toggle('active', switchModeActive);
+
+    if (!switchModeActive) {
+        resetSelections(); // Alle Markierungen zurücksetzen, wenn der Switch-Modus deaktiviert wird
+    }
+});
+
+function selectExerciseForSwitch(exerciseButton) {
+    if (!switchModeActive) return;
+
+    if (!firstSelectedExercise) {
+        // Wähle das erste Exercise aus
+        firstSelectedExercise = exerciseButton;
+        exerciseButton.classList.add('selected');
+    } else if (firstSelectedExercise === exerciseButton) {
+        // Hebe die Auswahl auf, wenn dasselbe Exercise erneut ausgewählt wird
+        exerciseButton.classList.remove('selected');
+        firstSelectedExercise = null;
+    } else {
+        // Wenn zwei verschiedene Exercises ausgewählt wurden, tausche sie
+        swapExercisePositions(firstSelectedExercise, exerciseButton);
+
+        // Nach dem Tausch die Auswahl zurücksetzen
+        clearSelection(); 
+    }
+}
+
+function clearSelection() {
+    // Entferne die 'selected'-Klasse von allen Buttons
+    document.querySelectorAll('.exercise-button.selected').forEach(button => {
+        button.classList.remove('selected');
+    });
+
+    // Setze die Variable zurück, um eine neue Auswahl zu ermöglichen
+    firstSelectedExercise = null;
+}
+
+function swapExercisePositions(button1, button2) {
+    const exerciseButtonsContainer = document.getElementById('exerciseButtons');
+
+    const temp = document.createElement('div');
+    exerciseButtonsContainer.insertBefore(temp, button1);
+    exerciseButtonsContainer.insertBefore(button1, button2);
+    exerciseButtonsContainer.insertBefore(button2, temp);
+    exerciseButtonsContainer.removeChild(temp);
+
+    updateExerciseOrderInStorage();
+
+    // Nach dem Tausch die Auswahl von beiden Buttons entfernen
+    clearSelection(); 
+}
+
+function updateExerciseOrderInStorage() {
+    const exerciseButtons = document.querySelectorAll('#exerciseButtons button.exercise-button');
+    const newActivityCounts = {};
+
+    exerciseButtons.forEach(button => {
+        const exerciseName = button.textContent.replace('Add ', '');
+        if (activityCounts[exerciseName]) {
+            newActivityCounts[exerciseName] = activityCounts[exerciseName];
+        }
+    });
+
+    activityCounts = newActivityCounts;
+    saveActivityData();
+}
+
+function resetSelections() {
+    document.querySelectorAll('.exercise-button.selected').forEach(button => {
+        button.classList.remove('selected');
+    });
+    firstSelectedExercise = null;
+}
+
+
+
+
+function swapExercisePositions(button1, button2) {
+    const exerciseButtonsContainer = document.getElementById('exerciseButtons');
+
+    const temp = document.createElement('div');
+    exerciseButtonsContainer.insertBefore(temp, button1);
+    exerciseButtonsContainer.insertBefore(button1, button2);
+    exerciseButtonsContainer.insertBefore(button2, temp);
+    exerciseButtonsContainer.removeChild(temp);
+
+    updateExerciseOrderInStorage();
+}
+
+function updateExerciseOrderInStorage() {
+    const exerciseButtons = document.querySelectorAll('#exerciseButtons button.exercise-button');
+    const newActivityCounts = {};
+
+    exerciseButtons.forEach(button => {
+        const exerciseName = button.textContent.replace('Add ', '');
+        if (activityCounts[exerciseName]) {
+            newActivityCounts[exerciseName] = activityCounts[exerciseName];
+        }
+    });
+
+    activityCounts = newActivityCounts;
+    saveActivityData();
+}
+
 function showAddExerciseModal() {
     const exerciseModal = document.getElementById('exerciseModal');
     exerciseModal.style.display = 'block';
 }
 
-// Show delete exercise modal
 function showDeleteExerciseModal() {
     const deleteModal = document.getElementById('deleteModal');
     const exerciseDeleteList = document.getElementById('exerciseDeleteList');
     exerciseDeleteList.innerHTML = '';
 
-    // Populate the list with current exercises
     for (const exercise in activityCounts) {
         const exerciseButton = document.createElement('button');
         exerciseButton.textContent = exercise;
         exerciseButton.classList.add('exercise-delete-button');
         exerciseButton.onclick = () => {
             exerciseButton.classList.toggle('selected');
-            exerciseButton.style.backgroundColor = exerciseButton.classList.contains('selected') ? '#ff4d4d' : ''; // Toggle red
+            exerciseButton.style.backgroundColor = exerciseButton.classList.contains('selected') ? '#ff4d4d' : '';
         };
         exerciseDeleteList.appendChild(exerciseButton);
     }
@@ -425,14 +500,12 @@ function showDeleteExerciseModal() {
     deleteModal.style.display = 'block';
 }
 
-// Delete selected exercises
 function deleteSelectedExercises() {
     const selectedButtons = document.querySelectorAll('.exercise-delete-button.selected');
     selectedButtons.forEach(button => {
         const exerciseName = button.textContent;
         delete activityCounts[exerciseName];
 
-        // Remove the button from the UI
         const buttonElements = document.querySelectorAll('#exerciseButtons button');
         buttonElements.forEach(btn => {
             if (btn.textContent.includes(exerciseName)) {
@@ -440,20 +513,17 @@ function deleteSelectedExercises() {
             }
         });
 
-        // Remove from today's activities UI
         const activityElement = document.getElementById(`${exerciseName}Count`);
         if (activityElement) {
             activityElement.remove();
         }
 
-        // Remove from dailyActivityLog
         for (let date in dailyActivityLog) {
             if (dailyActivityLog[date][exerciseName]) {
                 delete dailyActivityLog[date][exerciseName];
             }
         }
 
-        // Remove from challenges
         if (challenges[exerciseName]) {
             delete challenges[exerciseName];
         }
@@ -464,7 +534,6 @@ function deleteSelectedExercises() {
     closeModal('deleteModal');
 }
 
-// Reset today's counts to zero
 function resetTodaysCounts() {
     Object.keys(activityCounts).forEach(activity => {
         activityCounts[activity].count = 0;
@@ -473,10 +542,9 @@ function resetTodaysCounts() {
     saveActivityData();
 }
 
-// Update the today's activity list on the UI
 function updateActivityList() {
     const activityList = document.getElementById('activityList');
-    activityList.innerHTML = ''; // Clear the list first
+    activityList.innerHTML = '';
 
     Object.keys(activityCounts).forEach(activity => {
         if (!deactivatedExercises.includes(activity)) {
@@ -488,7 +556,6 @@ function updateActivityList() {
     });
 }
 
-// Initialize app on load
 document.addEventListener('DOMContentLoaded', () => {
     loadActivityData();
     initMusicControls();
@@ -497,15 +564,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showWelcomeScreen();
 });
 
-// Initialize music controls
 function initMusicControls() {
     const musicToggle = document.getElementById('musicToggle');
     const backgroundMusic = document.getElementById('backgroundMusic');
 
-    // Set initial volume
     backgroundMusic.volume = 0.1;
 
-    // Check local storage for music state
     const isMuted = JSON.parse(localStorage.getItem('musicMuted') || 'false');
 
     if (isMuted) {
@@ -516,7 +580,6 @@ function initMusicControls() {
         musicToggle.classList.remove('muted');
     }
 
-    // Toggle music on button click
     musicToggle.addEventListener('click', () => {
         if (backgroundMusic.paused) {
             backgroundMusic.play();
@@ -530,7 +593,6 @@ function initMusicControls() {
     });
 }
 
-// Initialize challenge controls
 function initChallengeControls() {
     const challengeToggle = document.getElementById('challengeToggle');
     challengeToggle.addEventListener('click', () => {
@@ -540,10 +602,9 @@ function initChallengeControls() {
     });
 }
 
-// Update the challenge list
 function updateChallengeList() {
     const challengeList = document.getElementById('challengeList');
-    challengeList.innerHTML = ''; // Clear existing challenges
+    challengeList.innerHTML = '';
 
     const colors = {
         Bronze: '#cd7f32',
@@ -554,14 +615,14 @@ function updateChallengeList() {
     };
 
     for (const [exercise, challenge] of Object.entries(challenges)) {
-        const progressText = challenge.rank === 'Legend' 
-            ? `${challenge.legendLevel}` 
+        const progressText = challenge.rank === 'Legend'
+            ? `${challenge.legendLevel}`
             : `${challenge.progress}${challenge.levels[challenge.rank.toLowerCase()] ? '/' + challenge.levels[challenge.rank.toLowerCase()] : ''}`;
 
         const startDate = new Date(challenge.startDate);
         const today = new Date();
         const timeDiff = today - startDate;
-        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Calculate days difference
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
         const startDateText = `${startDate.toLocaleDateString()} (${daysDiff}d ago)`;
 
@@ -581,24 +642,20 @@ function updateChallengeList() {
     }
 }
 
-// Show add challenge modal
 function showAddChallengeModal() {
     const addChallengeModal = document.getElementById('addChallengeModal');
     const exerciseSelection = document.getElementById('exerciseSelection');
-    exerciseSelection.innerHTML = ''; // Clear existing buttons
+    exerciseSelection.innerHTML = '';
 
-    // Populate with exercises
     for (const exercise in activityCounts) {
         if (!deactivatedExercises.includes(exercise)) {
             const exerciseButton = document.createElement('button');
             exerciseButton.textContent = exercise;
             exerciseButton.onclick = () => {
-                // Toggle selection
                 const buttons = exerciseSelection.querySelectorAll('button');
                 buttons.forEach(btn => btn.classList.remove('selected'));
                 exerciseButton.classList.add('selected');
 
-                // Show challenge settings
                 const challengeSettings = document.getElementById('challengeSettings');
                 challengeSettings.style.display = 'block';
             };
@@ -609,7 +666,6 @@ function showAddChallengeModal() {
     addChallengeModal.style.display = 'block';
 }
 
-// Create a new challenge
 function createChallenge() {
     const selectedButton = document.querySelector('#exerciseSelection button.selected');
     if (!selectedButton) {
@@ -617,12 +673,12 @@ function createChallenge() {
         return;
     }
 
-    const exercise = selectedButton.textContent.trim(); // Exact exercise name as selected
+    const exercise = selectedButton.textContent.trim();
     const bronzeLevel = parseInt(document.getElementById('bronzeLevel').value);
     const silverLevel = parseInt(document.getElementById('silverLevel').value);
     const goldLevel = parseInt(document.getElementById('goldLevel').value);
     const championLevel = parseInt(document.getElementById('championLevel').value);
-    const startDate = new Date(); // Capture the current date as start date
+    const startDate = new Date();
 
     challenges[exercise] = {
         rank: 'Bronze',
@@ -633,8 +689,8 @@ function createChallenge() {
             gold: goldLevel,
             champion: championLevel
         },
-        legendLevel: 0, // Initialize legend level count
-        startDate: startDate.toISOString() // Store start date as ISO string
+        legendLevel: 0,
+        startDate: startDate.toISOString()
     };
 
     saveActivityData();
@@ -642,10 +698,9 @@ function createChallenge() {
     closeModal('addChallengeModal');
 }
 
-// Show delete challenge modal
 function showDeleteChallengeModal() {
     const challengeList = document.getElementById('challengeList');
-    challengeList.innerHTML = ''; // Clear existing challenges
+    challengeList.innerHTML = '';
 
     for (const exercise in challenges) {
         const challengeButton = document.createElement('button');
@@ -653,7 +708,7 @@ function showDeleteChallengeModal() {
         challengeButton.classList.add('challenge-delete-button');
         challengeButton.onclick = () => {
             challengeButton.classList.toggle('selected');
-            challengeButton.style.backgroundColor = challengeButton.classList.contains('selected') ? '#ff4d4d' : ''; // Toggle red
+            challengeButton.style.backgroundColor = challengeButton.classList.contains('selected') ? '#ff4d4d' : '';
         };
         challengeList.appendChild(challengeButton);
     }
@@ -665,28 +720,25 @@ function showDeleteChallengeModal() {
     challengeList.appendChild(deleteButton);
 }
 
-// Show the welcome screen modal
-function showWelcomeScreen() {
-    const welcomeModal = document.getElementById('welcomeModal');
-    welcomeModal.style.display = 'block';
-}
-
-// Delete selected challenges
 function deleteSelectedChallenges() {
     const selectedButtons = document.querySelectorAll('.challenge-delete-button.selected');
     selectedButtons.forEach(button => {
         const exerciseName = button.textContent.trim();
         if (challenges[exerciseName]) {
-            delete challenges[exerciseName]; // Remove the challenge from the challenges object
+            delete challenges[exerciseName];
         }
     });
 
-    saveActivityData(); // Save the updated challenges object to localStorage
-    updateChallengeList(); // Refresh the challenge list to reflect the deletion
-    closeModal('challengeModal'); // Close the modal after deletion
+    saveActivityData();
+    updateChallengeList();
+    closeModal('challengeModal');
 }
 
-// Initialize activation controls
+function showWelcomeScreen() {
+    const welcomeModal = document.getElementById('welcomeModal');
+    welcomeModal.style.display = 'block';
+}
+
 function initActivationControls() {
     const activationToggle = document.getElementById('activationToggle');
     activationToggle.addEventListener('click', () => {
@@ -696,10 +748,9 @@ function initActivationControls() {
     });
 }
 
-// Update the activation list
 function updateActivationList() {
     const activationList = document.getElementById('exerciseActivationList');
-    activationList.innerHTML = ''; // Clear existing list
+    activationList.innerHTML = '';
 
     for (const exercise in activityCounts) {
         const activationButton = document.createElement('button');
@@ -710,20 +761,19 @@ function updateActivationList() {
         }
         activationButton.onclick = () => {
             activationButton.classList.toggle('selected');
-            activationButton.style.backgroundColor = activationButton.classList.contains('selected') ? '#ff4d4d' : ''; // Toggle red
+            activationButton.style.backgroundColor = activationButton.classList.contains('selected') ? '#ff4d4d' : '';
         };
         activationList.appendChild(activationButton);
     }
 }
 
-// Activate selected exercises
 function activateSelectedExercises() {
     const selectedButtons = document.querySelectorAll('.exercise-activation-button.selected');
     selectedButtons.forEach(button => {
         const exerciseName = button.textContent.trim();
         const index = deactivatedExercises.indexOf(exerciseName);
         if (index !== -1) {
-            deactivatedExercises.splice(index, 1); // Remove from deactivated list
+            deactivatedExercises.splice(index, 1);
             button.classList.remove('deactivated');
         }
     });
@@ -734,13 +784,12 @@ function activateSelectedExercises() {
     closeModal('activationModal');
 }
 
-// Deactivate selected exercises
 function deactivateSelectedExercises() {
     const selectedButtons = document.querySelectorAll('.exercise-activation-button.selected');
     selectedButtons.forEach(button => {
         const exerciseName = button.textContent.trim();
         if (!deactivatedExercises.includes(exerciseName)) {
-            deactivatedExercises.push(exerciseName); // Add to deactivated list
+            deactivatedExercises.push(exerciseName);
             button.classList.add('deactivated');
         }
     });
