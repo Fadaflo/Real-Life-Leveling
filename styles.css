@@ -506,3 +506,61 @@ header h1 {
     background-color: #ff4d4d;
     color: white;
 }
+
+.switch-mode-button {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    font-size: 25px;
+    background: none;
+    color: white;
+    border: none;
+    border-radius: 10%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.switch-mode-button.active {
+    background-color: #6200ea;
+    color: #ff4081;
+}
+
+
+/* Markiere den Button rot, wenn er ausgewählt ist */
+.exercise-button.selected {
+    background-color: #ff4d4d; /* Rot für ausgewählte Buttons */
+    color: #fff; /* Weiße Schrift für bessere Lesbarkeit */
+}
+
+/* Markiere den Button rot, wenn die Maus darüber fährt */
+.exercise-button:hover {
+    background-color: #ff4d4d; /* Rot für Hover */
+    color: #fff; /* Weiße Schrift für bessere Lesbarkeit */
+    transform: translateY(-3px);
+}
+
+
+
+/* Markiere den Button rot, wenn er ausgewählt ist */
+.exercise-button.selected,
+.exercise-button.selected:hover {
+    background-color: #ff4d4d; /* Rot für ausgewählte Buttons */
+    color: #fff; /* Weiße Schrift für bessere Lesbarkeit */
+}
+
+/* Markiere den Button rot, wenn die Maus darüber fährt, auch wenn er nicht ausgewählt ist */
+.exercise-button:hover {
+    background-color: #ff4d4d; /* Rot für Hover */
+    color: #fff; /* Weiße Schrift für bessere Lesbarkeit */
+    transform: translateY(-3px);
+}
+
+/* Beibehaltung des normalen Zustands, wenn er nicht ausgewählt ist und nicht gehovt wird */
+.exercise-button {
+    transition: background-color 0.3s, color 0.3s; /* Sanfter Übergang bei Farbwechsel */
+}
+
+
+
+
+
