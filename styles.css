@@ -411,7 +411,7 @@ header h1 {
 .activation-toggle {
     position: absolute;
     top: 70px;
-    right: 1463px; /* Adjusted position */
+    left: 3px; /* Adjusted position */
     font-size: 24px;
     color: #fff;
     background: none;
