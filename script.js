@@ -387,7 +387,7 @@ function createNewExerciseUI(exerciseName) {
     const activityList = document.getElementById('activityList');
     const newActivityElement = document.createElement('p');
     newActivityElement.id = `${exerciseName}Count`;
-    newActivityElement.textContent = `${capitalizeFirstLetter(exerciseName)}s: 0`;
+    newActivityElement.textContent = `${capitalizeFirstLetter(exerciseName)}: 0`;
     activityList.appendChild(newActivityElement);
 }
 
