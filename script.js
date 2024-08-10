@@ -19,9 +19,30 @@ function loadActivityData() {
         }
     }
 
-    // Reset daily counts if a new day has started
-    if (storedLastDate && storedLastDate !== today) {
-        resetTodaysCounts(); // Reset today's counts at midnight
+    // Reset counts if a new day, week, month, or year has started
+    if (storedLastDate) {
+        const lastDate = new Date(storedLastDate);
+        const currentDate = new Date();
+
+        // Reset today's counts if a new day has started
+        if (lastDate.toLocaleDateString() !== currentDate.toLocaleDateString()) {
+            resetTodaysCounts();
+        }
+
+        // Reset weekly counts if a new week has started (Monday)
+        if (currentDate.getDay() === 1 && lastDate.getDay() !== 1) {
+            resetWeeklyCounts();
+        }
+
+        // Reset monthly counts if a new month has started
+        if (currentDate.getMonth() !== lastDate.getMonth()) {
+            resetMonthlyCounts();
+        }
+
+        // Reset yearly counts if a new year has started
+        if (currentDate.getFullYear() !== lastDate.getFullYear()) {
+            resetYearlyCounts();
+        }
     }
 
     updateAllStatistics();
@@ -303,6 +324,30 @@ function resetTodaysActivities() {
     closeModal('resetTodayModal');
 }
 
+// Reset weekly counts to zero
+function resetWeeklyCounts() {
+    Object.keys(activityCounts).forEach(activity => {
+        activityCounts[activity].week = 0;
+    });
+    saveActivityData();
+}
+
+// Reset monthly counts to zero
+function resetMonthlyCounts() {
+    Object.keys(activityCounts).forEach(activity => {
+        activityCounts[activity].month = 0;
+    });
+    saveActivityData();
+}
+
+// Reset yearly counts to zero
+function resetYearlyCounts() {
+    Object.keys(activityCounts).forEach(activity => {
+        activityCounts[activity].year = 0;
+    });
+    saveActivityData();
+}
+
 // Show reset today's activities modal
 function showResetTodaysActivitiesModal() {
     const resetTodayModal = document.getElementById('resetTodayModal');
@@ -499,8 +544,6 @@ function updateChallengeList() {
     ? `${challenge.legendLevel}` 
     : `${challenge.progress}${challenge.levels[challenge.rank.toLowerCase()] ? '/' + challenge.levels[challenge.rank.toLowerCase()] : ''}`;
 
-
-
         const challengeElement = document.createElement('div');
         challengeElement.classList.add('challenge-item');
         challengeElement.innerHTML = `
@@ -611,3 +654,4 @@ function showWelcomeScreen() {
     const welcomeModal = document.getElementById('welcomeModal');
     welcomeModal.style.display = 'block';
 }
+
