@@ -595,42 +595,6 @@ function initMusicControls() {
 
 
 
-
-
-// Neue Funktion für App-Sichtbarkeit und Musikfortsetzung
-function handleAppVisibility() {
-    const backgroundMusic = document.getElementById('backgroundMusic');
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            // Speichere den aktuellen Zeitpunkt und stoppe die Musik
-            localStorage.setItem('musicCurrentTime', backgroundMusic.currentTime);
-            backgroundMusic.pause();
-        } else {
-            // Setze die Musik an der gespeicherten Stelle fort, wenn sie nicht stummgeschaltet ist
-            const savedTime = parseFloat(localStorage.getItem('musicCurrentTime') || '0');
-            backgroundMusic.currentTime = savedTime;
-
-            const isMuted = JSON.parse(localStorage.getItem('musicMuted') || 'false');
-            if (!isMuted) {
-                backgroundMusic.play();
-            }
-        }
-    });
-}
-
-// DOMContentLoaded Eventlistener, der alle Funktionen initialisiert
-document.addEventListener('DOMContentLoaded', () => {
-    loadActivityData();
-    initMusicControls(); // Musiksteuerung initialisieren
-    initChallengeControls();
-    initActivationControls();
-    showWelcomeScreen();
-    handleAppVisibility(); // App-Sichtbarkeitsüberwachung initialisieren
-});
-
-
-
 function initChallengeControls() {
     const challengeToggle = document.getElementById('challengeToggle');
     challengeToggle.addEventListener('click', () => {
