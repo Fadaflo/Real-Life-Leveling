@@ -32,7 +32,8 @@ header h1 {
 }
 
 .music-toggle,
-.challenge-toggle {
+.challenge-toggle,
+.activation-toggle {
     font-size: 24px;
     color: #fff;
     background: none;
@@ -47,6 +48,10 @@ header h1 {
 
 .challenge-toggle {
     margin-left: auto;
+}
+
+.activation-toggle {
+    margin-left: 10px;
 }
 
 .activity-input {
@@ -402,6 +407,23 @@ header h1 {
     color: #f50057;
 }
 
+/* Activation toggle button */
+.activation-toggle {
+    position: absolute;
+    top: 70px;
+    right: 21px; /* Adjusted position */
+    font-size: 24px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.activation-toggle:hover {
+    color: #f50057;
+}
+
 /* Welcome modal styling */
 .welcome-content {
     text-align: center;
@@ -461,4 +483,26 @@ header h1 {
     border-radius: 10px;
     margin-bottom: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.exercise-activation-button {
+    background-color: #6200ea;
+    color: white;
+    border: 2px solid #ff4081;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 5px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.exercise-activation-button.deactivated {
+    background-color: #777; /* Grey color for deactivated */
+    color: white;
+}
+
+.exercise-activation-button.selected {
+    background-color: #ff4d4d;
+    color: white;
 }
