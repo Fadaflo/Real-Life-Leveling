@@ -653,23 +653,29 @@ function showDeleteChallengeModal() {
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete Selected Challenges';
-    deleteButton.onclick = () => {
-        const selectedButtons = document.querySelectorAll('.challenge-delete-button.selected');
-        selectedButtons.forEach(button => {
-            const exerciseName = button.textContent.toLowerCase();
-            delete challenges[exerciseName];
-        });
-
-        saveActivityData();
-        updateChallengeList();
-        closeModal('challengeModal');
-    };
+    deleteButton.onclick = deleteSelectedChallenges;
 
     challengeList.appendChild(deleteButton);
 }
+
 
 // Show the welcome screen modal
 function showWelcomeScreen() {
     const welcomeModal = document.getElementById('welcomeModal');
     welcomeModal.style.display = 'block';
+}
+
+// Delete selected challenges
+function deleteSelectedChallenges() {
+    const selectedButtons = document.querySelectorAll('.challenge-delete-button.selected');
+    selectedButtons.forEach(button => {
+        const exerciseName = button.textContent.trim();
+        if (challenges[exerciseName]) {
+            delete challenges[exerciseName]; // Remove the challenge from the challenges object
+        }
+    });
+
+    saveActivityData(); // Save the updated challenges object to localStorage
+    updateChallengeList(); // Refresh the challenge list to reflect the deletion
+    closeModal('challengeModal'); // Close the modal after deletion
 }
