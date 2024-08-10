@@ -805,7 +805,49 @@ function deactivateSelectedExercises() {
 
 
 
-// Füge dies am Ende deines bestehenden JavaScript-Codes hinzu
+document.addEventListener('DOMContentLoaded', () => {
+    loadActivityData();
+    initMusicControls();
+    initChallengeControls();
+    initActivationControls();
+    showWelcomeScreen();
+    handleAppVisibility(); // Füge dies hinzu
+});
+
+function initMusicControls() {
+    const musicToggle = document.getElementById('musicToggle');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+    backgroundMusic.volume = 0.1;
+
+    // Überprüfe den gespeicherten Zustand
+    const isMuted = JSON.parse(localStorage.getItem('musicMuted') || 'false');
+    const savedTime = parseFloat(localStorage.getItem('musicCurrentTime') || '0');
+
+    backgroundMusic.currentTime = savedTime;
+
+    if (isMuted) {
+        backgroundMusic.pause();
+        musicToggle.classList.add('muted');
+    } else {
+        backgroundMusic.play();
+        musicToggle.classList.remove('muted');
+    }
+
+    musicToggle.addEventListener('click', () => {
+        if (backgroundMusic.paused) {
+            backgroundMusic.play();
+            musicToggle.classList.remove('muted');
+            localStorage.setItem('musicMuted', 'false');
+        } else {
+            backgroundMusic.pause();
+            musicToggle.classList.add('muted');
+            localStorage.setItem('musicMuted', 'true');
+        }
+    });
+}
+
+// Füge diese Funktion hinzu, um die Sichtbarkeit der App zu überwachen
 function handleAppVisibility() {
     const backgroundMusic = document.getElementById('backgroundMusic');
 
@@ -827,14 +869,4 @@ function handleAppVisibility() {
         }
     });
 }
-
-// Füge diese Funktion innerhalb des DOMContentLoaded-Ereignisses hinzu
-document.addEventListener('DOMContentLoaded', () => {
-    loadActivityData();
-    initMusicControls();
-    initChallengeControls();
-    initActivationControls();
-    showWelcomeScreen();
-    handleAppVisibility(); // Diese Zeile sorgt dafür, dass die Musik kontrolliert wird
-});
 
