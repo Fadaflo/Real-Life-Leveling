@@ -470,7 +470,7 @@ function resetTodaysCounts() {
 function updateActivityList() {
     for (const exercise in activityCounts) {
         if (document.getElementById(`${exercise}Count`)) {
-            document.getElementById(`${exercise}Count`).textContent = `${capitalizeFirstLetter(exercise)}s: ${activityCounts[exercise].count}`;
+            document.getElementById(`${exercise}Count`).textContent = `${capitalizeFirstLetter(exercise)}: ${activityCounts[exercise].count}`;
         }
     }
 }
