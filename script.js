@@ -140,7 +140,7 @@ function showCongratulationsModal(activity, rank) {
 
 // Update activity counts on the UI
 function updateActivityCounts(activity) {
-    document.getElementById(`${activity}Count`).textContent = `${capitalizeFirstLetter(activity)}s: ${activityCounts[activity].count}`;
+    document.getElementById(`${activity}Count`).textContent = `${capitalizeFirstLetter(activity)}: ${activityCounts[activity].count}`;
 }
 
 // Update all statistics
